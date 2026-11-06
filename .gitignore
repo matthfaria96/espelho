@@ -1,0 +1,22 @@
+.build/
+build/
+iOS/*.xcodeproj
+iOS/**/Info.plist
+*.entitlements
+xcuserdata/
+.DS_Store
+vendor/
+.swiftpm/
+Espelho/.build/
+# Older Phone Tomato experiment (iOS app + receiver) stays local
+.local/
+/Sources/
+/Tests/
+/iOS/
+/Package.swift
+/Package.resolved
+/.build/
+scripts/setup-ios.sh
+scripts/make-mac-app.sh
+scripts/make-ipa.sh
+scripts/run-wda.sh
