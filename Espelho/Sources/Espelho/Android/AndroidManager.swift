@@ -167,7 +167,7 @@ final class AndroidManager: ObservableObject {
             defer { goingWireless = nil }
             let route = await ADB.run(["-s", device.serial, "shell", "ip route"], timeout: 8).output
             guard let ip = ADBText.wifiAddress(fromIpRoute: route) else {
-                MirrorService.shared.showToast("Ligue o Wi-Fi do Android (na mesma rede do Mac) e tente de novo.",
+                MirrorService.shared.showToast(String(localized: "Ligue o Wi-Fi do Android (na mesma rede do Mac) e tente de novo."),
                                                symbol: "wifi.exclamationmark", duration: 6)
                 return
             }
@@ -181,7 +181,7 @@ final class AndroidManager: ObservableObject {
                 try? await Task.sleep(for: .seconds(1))
             }
             guard connectedOK else {
-                MirrorService.shared.showToast("Não foi possível conectar pelo Wi-Fi. Confira se o Android e o Mac estão na mesma rede.",
+                MirrorService.shared.showToast(String(localized: "Não foi possível conectar pelo Wi-Fi. Confira se o Android e o Mac estão na mesma rede."),
                                                symbol: "wifi.exclamationmark", duration: 6)
                 return
             }
@@ -190,7 +190,7 @@ final class AndroidManager: ObservableObject {
             UserDefaults.standard.set(saved, forKey: Self.endpointsKey)
             remember(device)
             await refresh()
-            MirrorService.shared.showToast("Pronto! Pode tirar o cabo. Vale até o Android reiniciar.",
+            MirrorService.shared.showToast(String(localized: "Pronto! Pode tirar o cabo. Vale até o Android reiniciar."),
                                            symbol: "wifi", duration: 6)
         }
     }
@@ -230,7 +230,7 @@ final class AndroidManager: ObservableObject {
                 }
                 try? await Task.sleep(for: .seconds(1))
             }
-            if !Task.isCancelled { self?.pairing = .failed("O código expirou. Gere um novo e tente de novo.") }
+            if !Task.isCancelled { self?.pairing = .failed(String(localized: "O código expirou. Gere um novo e tente de novo.")) }
         }
     }
 
@@ -248,7 +248,7 @@ final class AndroidManager: ObservableObject {
                 }
                 try? await Task.sleep(for: .seconds(1))
             }
-            self?.pairing = .failed("O Android não foi encontrado na rede. Deixe a janela do código aberta nele e confira se os dois estão no mesmo Wi-Fi.")
+            self?.pairing = .failed(String(localized: "O Android não foi encontrado na rede. Deixe a janela do código aberta nele e confira se os dois estão no mesmo Wi-Fi."))
         }
     }
 
@@ -269,8 +269,8 @@ final class AndroidManager: ObservableObject {
         let result = await ADB.run(["pair", address, secret], timeout: 20)
         guard result.output.contains("Successfully paired") else {
             pairing = .failed(result.output.lowercased().contains("wrong password") || result.output.lowercased().contains("failed")
-                              ? "O código não confere. Tente de novo."
-                              : "Não foi possível parear. Tente de novo.")
+                              ? String(localized: "O código não confere. Tente de novo.")
+                              : String(localized: "Não foi possível parear. Tente de novo."))
             return
         }
         pairing = .connecting
@@ -298,7 +298,7 @@ final class AndroidManager: ObservableObject {
             }
             try? await Task.sleep(for: .seconds(1))
         }
-        pairing = .failed("Pareado, mas o Android não se conectou. Confira se a Depuração por Wi-Fi continua ligada.")
+        pairing = .failed(String(localized: "Pareado, mas o Android não se conectou. Confira se a Depuração por Wi-Fi continua ligada."))
     }
 
     // MARK: QR code

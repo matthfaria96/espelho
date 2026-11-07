@@ -59,6 +59,8 @@ cp "$UX/build/uxplay" "$APP/Contents/Helpers/uxplay"
 cp "$ADB_BIN" "$APP/Contents/Helpers/adb"
 cp "$SCRCPY_SERVER" "$APP/Contents/Resources/scrcpy-server.jar"
 iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/AppIcon.icns"
+python3 scripts/make-localizations.py >/dev/null
+cp -R Espelho/Resources/Localizations/*.lproj "$APP/Contents/Resources/"
 
 source scripts/info-plist.sh
 write_info_plist "$APP/Contents/Info.plist"

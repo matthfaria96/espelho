@@ -1,8 +1,10 @@
 # Espelho
 
+**English** · [Português](README.pt-BR.md)
+
 Mirror an **iPhone, iPad or Android** phone or tablet into a window on your Mac, with sound. iPhone and iPad use **Screen Mirroring** from Control Center, with nothing to install on them. Android connects over Wi‑Fi (QR code) or a USB cable, and you can **use it with the Mac's mouse and keyboard**.
 
-The interface is in Brazilian Portuguese. Free software (GPL-3.0), part of [witchmymac](https://witchmymac.com).
+In English, Portuguese and Spanish: it follows the Mac’s language, and *Settings › Language* switches it. Free software (GPL-3.0), part of [witchmymac](https://witchmymac.com).
 
 ![Espelho ready to mirror an iPhone or iPad](docs/screenshots/home.jpg)
 
@@ -43,9 +45,9 @@ Everything Espelho needs travels inside the app: no Homebrew, no drivers, nothin
 **Android (Android 11+), once per device:**
 1. *Settings › About phone* › tap **Build number** 7 times (unlocks Developer options).
 2. *Developer options* › turn on **Wireless debugging**.
-3. In Espelho: **Android** tab › **Conectar pelo Wi‑Fi…**, and on the phone: *Wireless debugging › Pair device with QR code*.
+3. In Espelho: **Android** tab › **Connect over Wi‑Fi…**, and on the phone: *Wireless debugging › Pair device with QR code*.
 
-Android 10 or older: turn on *USB debugging*, plug the cable and click **Usar sem fio**. Xiaomi/Redmi/POCO also need *USB debugging (Security settings)* to accept touches; Espelho tells you when that's missing.
+Android 10 or older: turn on *USB debugging*, plug the cable and click **Go Wireless**. Xiaomi/Redmi/POCO also need *USB debugging (Security settings)* to accept touches; Espelho tells you when that's missing.
 
 | On the Mac | Does |
 |---|---|
@@ -73,6 +75,8 @@ Needs Xcode 26+ and Homebrew.
                                 # libraries, adb and the scrcpy server bundled inside; signed and packed in a DMG
 swift test --package-path Espelho
 ```
+
+Translations: the Swift code is written with Portuguese strings, which are the keys; English and Spanish live in `scripts/translations.py`. `python3 scripts/make-localizations.py --check` writes the `.lproj` folders and lists any text still missing a translation (both build scripts run it). English is the fallback for every other language.
 
 `make-release.sh` expects the witchmymac release tools (signing certificate, Sparkle key, DMG script) next to this repo; see the script header.
 

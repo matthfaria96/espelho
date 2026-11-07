@@ -61,6 +61,8 @@ for s in 16 32 128 256 512; do
   sips -z $((s*2)) $((s*2)) Espelho/Resources/icon-1024.png --out "$ICONSET/icon_${s}x${s}@2x.png" >/dev/null
 done
 iconutil -c icns "$ICONSET" -o "$C/Resources/AppIcon.icns"
+python3 scripts/make-localizations.py >/dev/null
+cp -R Espelho/Resources/Localizations/*.lproj "$C/Resources/"
 
 # UxPlay + only the GStreamer plugins it uses, then every library they need.
 GST=$(realpath "$(brew --prefix gstreamer)")

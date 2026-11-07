@@ -38,7 +38,7 @@ enum ADB {
     /// Runs `adb <args>` and returns its combined output.
     @discardableResult
     static func run(_ args: [String], timeout: Double = 20) async -> (ok: Bool, output: String) {
-        guard let url else { return (false, "adb não encontrado") }
+        guard let url else { return (false, String(localized: "adb não encontrado")) }
         return await Task.detached {
             let p = Process()
             p.executableURL = url

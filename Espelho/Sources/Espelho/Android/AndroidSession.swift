@@ -69,21 +69,21 @@ final class AndroidSession: @unchecked Sendable {
             guard let jar = Bundle.main.url(forResource: "scrcpy-server", withExtension: "jar")
                     ?? Self.homebrewServer(),
                   let version = Self.serverVersion else {
-                fail("O componente para Android não foi encontrado. Reinstale o Espelho.")
+                fail(String(localized: "O componente para Android não foi encontrado. Reinstale o Espelho."))
                 return
             }
             let push = await ADB.run(["-s", config.serial, "push", jar.path, Self.devicePath], timeout: 30)
             guard push.ok else {
-                fail(Self.explain(push.output, fallback: "Não foi possível preparar o Android."))
+                fail(Self.explain(push.output, fallback: String(localized: "Não foi possível preparar o Android.")))
                 return
             }
             guard let port = await openListener() else {
-                fail("Não foi possível abrir o canal de vídeo.")
+                fail(String(localized: "Não foi possível abrir o canal de vídeo."))
                 return
             }
             let reverse = await ADB.run(["-s", config.serial, "reverse", "localabstract:\(socketName)", "tcp:\(port)"])
             guard reverse.ok else {
-                fail(Self.explain(reverse.output, fallback: "O Android recusou a conexão."))
+                fail(Self.explain(reverse.output, fallback: String(localized: "O Android recusou a conexão.")))
                 return
             }
             if isFinished { return }
@@ -95,17 +95,17 @@ final class AndroidSession: @unchecked Sendable {
                     DispatchQueue.main.async { self.onControlBlocked?() }
                 }
             }) { [weak self] in
-                self?.fail("O Android encerrou o espelhamento.")
+                self?.fail(String(localized: "O Android encerrou o espelhamento."))
             }
             queue.sync {
                 if finished { process?.terminate() } else { server = process }
             }
-            if process == nil { fail("Não foi possível iniciar o espelhamento no Android.") }
+            if process == nil { fail(String(localized: "Não foi possível iniciar o espelhamento no Android.")) }
 
             // No picture in 15 s: something is wrong (screen locked behind a dialog, old Android…).
             queue.asyncAfter(deadline: .now() + 15) { [weak self] in
                 guard let self, !self.gotVideo else { return }
-                self.finish("O Android não respondeu. Desbloqueie a tela dele e tente de novo.")
+                self.finish(String(localized: "O Android não respondeu. Desbloqueie a tela dele e tente de novo."))
             }
         }
     }
@@ -210,7 +210,7 @@ final class AndroidSession: @unchecked Sendable {
                 let count = read(fd, &buffer, buffer.count)
                 guard let self else { return }
                 if count <= 0 {
-                    if role != .audio { self.fail("A conexão com o Android caiu.") }
+                    if role != .audio { self.fail(String(localized: "A conexão com o Android caiu.")) }
                     return
                 }
                 let data = Data(buffer[0..<count])
@@ -233,9 +233,9 @@ final class AndroidSession: @unchecked Sendable {
                 DispatchQueue.main.async { self.onDeviceName?(name) }
             case .codec(let codec):
                 Self.debug("codec \(String(codec, radix: 16))")
-                if codec != ScrcpyStreamParser.codecH264 { finish("Formato de vídeo não suportado pelo Android.") }
+                if codec != ScrcpyStreamParser.codecH264 { finish(String(localized: "Formato de vídeo não suportado pelo Android.")) }
             case .disabled:
-                finish("O Android não conseguiu capturar a tela.")
+                finish(String(localized: "O Android não conseguiu capturar a tela."))
             case .session(let width, let height):
                 Self.debug("tamanho \(width)x\(height)")
                 let newSize = CGSize(width: width, height: height)
@@ -299,8 +299,8 @@ final class AndroidSession: @unchecked Sendable {
 
     static func explain(_ output: String, fallback: String) -> String {
         let text = output.lowercased()
-        if text.contains("unauthorized") { return "Toque em “Permitir” no Android para autorizar este Mac." }
-        if text.contains("offline") || text.contains("not found") { return "O Android se desconectou. Verifique se a Depuração por Wi-Fi continua ligada." }
+        if text.contains("unauthorized") { return String(localized: "Toque em “Permitir” no Android para autorizar este Mac.") }
+        if text.contains("offline") || text.contains("not found") { return String(localized: "O Android se desconectou. Verifique se a Depuração por Wi-Fi continua ligada.") }
         return fallback
     }
 }

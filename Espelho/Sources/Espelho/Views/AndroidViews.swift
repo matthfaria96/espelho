@@ -74,7 +74,7 @@ struct AndroidCard: View {
         .padding(22)
     }
 
-    private func option<Accessory: View>(symbol: String, title: String, detail: String,
+    private func option<Accessory: View>(symbol: String, title: LocalizedStringKey, detail: LocalizedStringKey,
                                          @ViewBuilder accessory: () -> Accessory) -> some View {
         VStack(spacing: 10) {
             Image(systemName: symbol)
@@ -148,13 +148,13 @@ struct AndroidCard: View {
 
     private func status(_ device: AndroidManager.Device) -> String {
         switch device.state {
-        case "device": device.isWireless ? "Conectado pelo Wi-Fi" : "Conectado pelo cabo"
-        case "unauthorized": "Toque em “Permitir” no aparelho"
-        default: "Aguardando o aparelho…"
+        case "device": device.isWireless ? String(localized: "Conectado pelo Wi-Fi") : String(localized: "Conectado pelo cabo")
+        case "unauthorized": String(localized: "Toque em “Permitir” no aparelho")
+        default: String(localized: "Aguardando o aparelho…")
         }
     }
 
-    private func message(_ symbol: String, _ title: String, _ detail: String) -> some View {
+    private func message(_ symbol: String, _ title: LocalizedStringKey, _ detail: LocalizedStringKey) -> some View {
         VStack(spacing: 8) {
             Image(systemName: symbol).font(.system(size: 24)).foregroundStyle(.orange)
             Text(title).font(.system(size: 13, weight: .semibold))
@@ -293,7 +293,7 @@ struct AndroidPairingView: View {
         }
     }
 
-    private func step(_ number: Int, _ title: String, _ detail: String) -> some View {
+    private func step(_ number: Int, _ title: LocalizedStringKey, _ detail: LocalizedStringKey) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Text("\(number)")
                 .font(.system(size: 12, weight: .bold, design: .rounded))

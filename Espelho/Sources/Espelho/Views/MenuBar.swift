@@ -48,11 +48,11 @@ struct MenuBarContent: View {
 
     private var status: String {
         switch service.phase {
-        case .starting: "Iniciando…"
-        case .ready: "Pronto · visível como “\(service.advertisedName)”"
-        case .connecting: "Conectando \(service.deviceName ?? "aparelho")…"
-        case .mirroring: "Espelhando \(service.deviceName ?? "aparelho")"
-        case .failed: "Receptor parado"
+        case .starting: String(localized: "Iniciando…")
+        case .ready: String(localized: "Pronto · visível como “\(service.advertisedName)”")
+        case .connecting: String(localized: "Conectando \(service.deviceName ?? String(localized: "aparelho"))…")
+        case .mirroring: String(localized: "Espelhando \(service.deviceName ?? String(localized: "aparelho"))")
+        case .failed: String(localized: "Receptor parado")
         }
     }
 }

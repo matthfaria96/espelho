@@ -17,6 +17,8 @@ struct SettingsView: View {
     @AppStorage(Prefs.androidAutoConnect) private var androidAutoConnect = true
     @AppStorage(Prefs.androidScreenOff) private var androidScreenOff = false
     @State private var forgotAndroid = false
+    @State private var language = AppLanguage.current
+    @State private var languageChanged = false
 
     @State private var draftName = ""
     @State private var draftDelay = 0.0
@@ -137,6 +139,26 @@ struct SettingsView: View {
             }
 
             Section {
+                Picker("Idioma", selection: $language) {
+                    ForEach(AppLanguage.allCases) { Text($0.title).tag($0) }
+                }
+                .onChange(of: language) { _, value in
+                    value.apply()
+                    languageChanged = true
+                }
+                if languageChanged {
+                    HStack {
+                        Label("O novo idioma vale depois de reabrir o Espelho.", systemImage: "arrow.clockwise.circle")
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Button("Reabrir Agora") { AppLanguage.relaunch() }
+                    }
+                }
+            } header: {
+                Text("Idioma")
+            }
+
+            Section {
                 AboutRow()
             }
         }
@@ -157,7 +179,7 @@ struct SettingsView: View {
     }
 
     private func delayLabel(_ ms: Int) -> String {
-        ms == 0 ? "Automático" : (ms > 0 ? "+\(ms) ms" : "\(ms) ms")
+        ms == 0 ? String(localized: "Automático") : (ms > 0 ? "+\(ms) ms" : "\(ms) ms")
     }
 
     private func commitName() {
@@ -185,7 +207,7 @@ struct SettingsView: View {
             }
             loginError = nil
         } catch {
-            loginError = "Não foi possível mudar: \(error.localizedDescription)"
+            loginError = String(localized: "Não foi possível mudar: \(error.localizedDescription)")
             launchAtLogin = SMAppService.mainApp.status == .enabled
         }
     }
@@ -195,7 +217,9 @@ struct SettingsView: View {
 private struct AboutRow: View {
     private var version: String {
         let info = Bundle.main.infoDictionary
-        return "Versão \(info?["CFBundleShortVersionString"] as? String ?? "?") (\(info?["CFBundleVersion"] as? String ?? "?"))"
+        let short = info?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info?["CFBundleVersion"] as? String ?? "?"
+        return String(localized: "Versão \(short) (\(build))")
     }
 
     var body: some View {

@@ -83,7 +83,7 @@ final class MirrorService: ObservableObject {
         return isDeviceIPad ? "ipad" : "iphone"
     }
     var fallbackDeviceName: String {
-        source == .android ? (androidIsTablet ? "Tablet Android" : "Android") : (isDeviceIPad ? "iPad" : "iPhone")
+        source == .android ? (androidIsTablet ? String(localized: "Tablet Android") : "Android") : (isDeviceIPad ? "iPad" : "iPhone")
     }
 
     // MARK: Lifecycle
@@ -101,7 +101,7 @@ final class MirrorService: ObservableObject {
         receiver.start { [weak self] port in
             self?.launch(port: port)
         } onFailure: { [weak self] message in
-            self?.phase = .failed("Não foi possível abrir o canal de vídeo (\(message)).")
+            self?.phase = .failed(String(localized: "Não foi possível abrir o canal de vídeo (\(message))."))
         }
     }
 
@@ -131,11 +131,11 @@ final class MirrorService: ObservableObject {
         if source == .android {
             if let androidDevice { AndroidManager.shared.dismiss(androidDevice) }
             stopAndroid()
-            showToast("Android desconectado", symbol: "bolt.horizontal.circle")
+            showToast(String(localized: "Android desconectado"), symbol: "bolt.horizontal.circle")
             return
         }
         restart()
-        showToast("Aparelho desconectado", symbol: "bolt.horizontal.circle")
+        showToast(String(localized: "Aparelho desconectado"), symbol: "bolt.horizontal.circle")
     }
 
     func shutdown() {
@@ -151,7 +151,7 @@ final class MirrorService: ObservableObject {
 
     private func launch(port: UInt16) {
         guard let executable = Self.uxplayURL() else {
-            phase = .failed("O componente de espelhamento não foi encontrado. Reinstale o Espelho.")
+            phase = .failed(String(localized: "O componente de espelhamento não foi encontrado. Reinstale o Espelho."))
             return
         }
         let settings = Prefs.current
@@ -190,7 +190,7 @@ final class MirrorService: ObservableObject {
             try process.run()
             self.process = process
         } catch {
-            phase = .failed("Não foi possível iniciar o espelhamento: \(error.localizedDescription)")
+            phase = .failed(String(localized: "Não foi possível iniciar o espelhamento: \(error.localizedDescription)"))
         }
     }
 
@@ -212,9 +212,9 @@ final class MirrorService: ObservableObject {
         if dyldAbort || recent.contains(where: { $0.contains("Library not loaded") || $0.contains("dyld") }) {
             if Self.canRebuild {
                 needsRepair = true
-                phase = .failed("Uma atualização do Homebrew mudou componentes de que o Espelho precisa. Clique em Reparar: ele é recompilado e reaberto sozinho (leva cerca de 1 minuto).")
+                phase = .failed(String(localized: "Uma atualização do Homebrew mudou componentes de que o Espelho precisa. Clique em Reparar: ele é recompilado e reaberto sozinho (leva cerca de 1 minuto)."))
             } else {
-                phase = .failed("Um componente do Espelho está faltando ou danificado. Baixe-o de novo em witchmymac.com/espelho.")
+                phase = .failed(String(localized: "Um componente do Espelho está faltando ou danificado. Baixe-o de novo em witchmymac.com/espelho."))
             }
             return
         }
@@ -223,7 +223,8 @@ final class MirrorService: ObservableObject {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in self?.start() }
         } else {
             let detail = output?.recentLines.last { $0.localizedCaseInsensitiveContains("error") } ?? ""
-            phase = .failed("O espelhamento parou de responder.\(detail.isEmpty ? "" : "\n\(detail)")")
+            let stopped = String(localized: "O espelhamento parou de responder.")
+            phase = .failed(detail.isEmpty ? stopped : stopped + "\n" + detail)
         }
     }
 
@@ -237,7 +238,7 @@ final class MirrorService: ObservableObject {
                 // (and the Android isn't reconnected automatically when the iPhone leaves).
                 if let androidDevice { AndroidManager.shared.dismiss(androidDevice) }
                 stopAndroid()
-                showToast("Trocando para o \(Self.appleName(event))", symbol: "arrow.left.arrow.right")
+                showToast(String(localized: "Trocando para o \(Self.appleName(event))"), symbol: "arrow.left.arrow.right")
             case .ready:
                 crashCount = 0
                 return
@@ -265,7 +266,7 @@ final class MirrorService: ObservableObject {
             if count == 0 { endSession() }
         case .lost:
             if phase == .mirroring {
-                showToast("A conexão com o aparelho caiu", symbol: "wifi.exclamationmark")
+                showToast(String(localized: "A conexão com o aparelho caiu"), symbol: "wifi.exclamationmark")
             }
             endSession()
         }
@@ -326,7 +327,7 @@ final class MirrorService: ObservableObject {
             let item = DispatchWorkItem { [weak self] in
                 guard let self, self.phase == .connecting, self.pin == nil else { return }
                 if self.source == .android {
-                    self.stopAndroid(message: "O Android não respondeu. Desbloqueie a tela dele e tente de novo.")
+                    self.stopAndroid(message: String(localized: "O Android não respondeu. Desbloqueie a tela dele e tente de novo."))
                 } else {
                     self.setPhase(.ready)
                 }
@@ -359,7 +360,7 @@ final class MirrorService: ObservableObject {
             withAnimation(.smooth) { self?.videoSize = size }
         }
         session.onControlBlocked = { [weak self] in
-            self?.showToast("Este Android bloqueia o controle pelo Mac. Em Opções do desenvolvedor, ligue “Depuração USB (configurações de segurança)” e reinicie o aparelho. A imagem continua funcionando.",
+            self?.showToast(String(localized: "Este Android bloqueia o controle pelo Mac. Em Opções do desenvolvedor, ligue “Depuração USB (configurações de segurança)” e reinicie o aparelho. A imagem continua funcionando."),
                             symbol: "hand.raised.slash", duration: 12)
         }
         session.onEnded = { [weak self] reason in
@@ -424,23 +425,24 @@ final class MirrorService: ObservableObject {
         if copyOnly {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setData(png, forType: .png)
-            showToast("Tela copiada", symbol: "doc.on.clipboard")
+            showToast(String(localized: "Tela copiada"), symbol: "doc.on.clipboard")
             return
         }
         let folder = FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Pictures/Espelho", isDirectory: true)
         try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "pt_BR")
-        formatter.dateFormat = "yyyy-MM-dd 'às' HH.mm.ss"
+        // Like macOS's own screenshots: "iPhone 2026-11-07 at 10.12.33".
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = String(localized: "yyyy-MM-dd 'às' HH.mm.ss")
         let device = deviceName ?? fallbackDeviceName
         let url = folder.appendingPathComponent("\(device) \(formatter.string(from: Date())).png")
         do {
             try png.write(to: url)
             NSSound(named: "Grab")?.play()
-            showToast("Captura salva em Imagens › Espelho", symbol: "camera.fill", revealURL: url)
+            showToast(String(localized: "Captura salva em Imagens › Espelho"), symbol: "camera.fill", revealURL: url)
         } catch {
-            showToast("Não foi possível salvar a captura", symbol: "exclamationmark.triangle")
+            showToast(String(localized: "Não foi possível salvar a captura"), symbol: "exclamationmark.triangle")
         }
     }
 

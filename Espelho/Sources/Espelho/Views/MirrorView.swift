@@ -46,7 +46,7 @@ struct MirrorView: View {
                 .font(.system(size: 13, weight: .semibold))
                 .lineLimit(1)
             if service.videoSize != .zero {
-                Text(verbatim: "\(Int(service.videoSize.width))×\(Int(service.videoSize.height))" + (service.fps > 0 ? " · \(service.fps) qps" : ""))
+                Text(verbatim: "\(Int(service.videoSize.width))×\(Int(service.videoSize.height))" + (service.fps > 0 ? " · " + String(localized: "\(service.fps) qps") : ""))
                     .font(.system(size: 11.5, weight: .medium).monospacedDigit())
                     .foregroundStyle(.secondary)
                     .contentTransition(.numericText())
@@ -126,7 +126,7 @@ struct MirrorView: View {
 
 struct ControlButton: View {
     var symbol: String
-    var help: String
+    var help: LocalizedStringKey
     var highlighted = false
     var destructive = false
     var action: () -> Void

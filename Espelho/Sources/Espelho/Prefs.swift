@@ -1,4 +1,4 @@
-import Foundation
+import AppKit
 
 /// User preferences (UserDefaults keys shared with @AppStorage).
 enum Prefs {
@@ -23,8 +23,8 @@ enum Prefs {
         var id: String { rawValue }
         var title: String {
             switch self {
-            case .standard: "Padrão · 1080p"
-            case .high: "Alta · 1440p"
+            case .standard: String(localized: "Padrão · 1080p")
+            case .high: String(localized: "Alta · 1440p")
             }
         }
         var size: (width: Int, height: Int) {
@@ -86,5 +86,47 @@ enum Prefs {
         let value = bytes.map { String(format: "%02x", $0) }.joined(separator: ":")
         UserDefaults.standard.set(value, forKey: macAddress)
         return value
+    }
+}
+
+/// Interface language. "system" follows macOS (System Settings › General › Language & Region,
+/// where Espelho can also be set per app); the others override it for Espelho only.
+enum AppLanguage: String, CaseIterable, Identifiable {
+    case system, en, es, ptBR = "pt-BR"
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .system: String(localized: "Idioma do sistema")
+        case .en: "English"
+        case .es: "Español"
+        case .ptBR: "Português (Brasil)"
+        }
+    }
+
+    /// macOS reads the app's languages at launch from AppleLanguages in its own domain.
+    static var current: AppLanguage {
+        guard let list = UserDefaults.standard.persistentDomain(forName: Bundle.main.bundleIdentifier ?? "")?["AppleLanguages"] as? [String],
+              let first = list.first else { return .system }
+        if first.hasPrefix("pt") { return .ptBR }
+        if first.hasPrefix("es") { return .es }
+        return first.hasPrefix("en") ? .en : .system
+    }
+
+    func apply() {
+        if self == .system {
+            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+        } else {
+            UserDefaults.standard.set([rawValue], forKey: "AppleLanguages")
+        }
+    }
+
+    @MainActor
+    static func relaunch() {
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/bin/sh")
+        task.arguments = ["-c", "sleep 0.6; /usr/bin/open \"$0\"", Bundle.main.bundlePath]
+        try? task.run()
+        NSApp.terminate(nil)
     }
 }

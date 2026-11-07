@@ -142,7 +142,7 @@ private struct ChooserPage: View {
         .padding(.horizontal, 32)
     }
 
-    private func card(_ platform: OnboardingView.Platform, symbol: String, title: String, detail: String, time: String) -> some View {
+    private func card(_ platform: OnboardingView.Platform, symbol: String, title: LocalizedStringKey, detail: LocalizedStringKey, time: LocalizedStringKey) -> some View {
         Button { choose(platform) } label: {
             VStack(spacing: 10) {
                 Image(systemName: symbol)
@@ -173,7 +173,7 @@ private struct ChooserPage: View {
 
 private struct StepPage<Illustration: View, Text_: View>: View {
     var number: Int?
-    var title: String
+    var title: LocalizedStringKey
     @ViewBuilder var illustration: Illustration
     @ViewBuilder var text: Text_
 
@@ -355,7 +355,7 @@ private struct AndroidSteps: View {
         }
     }
 
-    private func brand(_ name: String, _ path: String) -> some View {
+    private func brand(_ name: LocalizedStringKey, _ path: LocalizedStringKey) -> some View {
         VStack(alignment: .leading, spacing: 1) {
             Text(name).font(.system(size: 12, weight: .semibold))
             Text(path).font(.system(size: 11.5)).foregroundStyle(.secondary)
@@ -619,7 +619,7 @@ private struct MirrorListMock: View {
                     .foregroundStyle(.white)
                     .padding(14)
                     Divider().overlay(.white.opacity(0.2))
-                    row(symbol: "macwindow", title: name, highlight: true, checked: tapped)
+                    row(symbol: "macwindow", title: "\(name)", highlight: true, checked: tapped)
                     Divider().overlay(.white.opacity(0.2)).padding(.leading, 44)
                     row(symbol: "macbook", title: "Mac de casa", highlight: false, checked: false)
                     Divider().overlay(.white.opacity(0.2)).padding(.leading, 44)
@@ -634,7 +634,7 @@ private struct MirrorListMock: View {
         }
     }
 
-    private func row(symbol: String, title: String, highlight: Bool, checked: Bool) -> some View {
+    private func row(symbol: String, title: LocalizedStringKey, highlight: Bool, checked: Bool) -> some View {
         HStack(spacing: 10) {
             Image(systemName: symbol).frame(width: 20)
             Text(title).font(.system(size: 13, weight: highlight ? .semibold : .regular)).lineLimit(1)
@@ -650,7 +650,7 @@ private struct MirrorListMock: View {
 
 /// Android-style settings screen (light).
 private struct SettingsScreen<Content: View>: View {
-    var title: String
+    var title: LocalizedStringKey
     @ViewBuilder var content: Content
 
     var body: some View {
@@ -676,8 +676,8 @@ private struct SettingsScreen<Content: View>: View {
 }
 
 private struct SettingsRow: View {
-    var title: String
-    var detail: String?
+    var title: LocalizedStringKey
+    var detail: LocalizedStringKey?
     var highlight = false
     var toggle: Bool?
 

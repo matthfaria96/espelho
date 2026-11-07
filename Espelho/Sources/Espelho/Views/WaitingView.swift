@@ -112,24 +112,24 @@ struct WaitingView: View {
 
     private var title: String {
         switch service.phase {
-        case .starting: "Preparando…"
-        case .ready: "Pronto para espelhar"
-        case .connecting: "Conectando \(service.deviceName ?? "aparelho")…"
+        case .starting: String(localized: "Preparando…")
+        case .ready: String(localized: "Pronto para espelhar")
+        case .connecting: String(localized: "Conectando \(service.deviceName ?? String(localized: "aparelho"))…")
         case .mirroring: ""
-        case .failed: "Algo deu errado"
+        case .failed: String(localized: "Algo deu errado")
         }
     }
 
     private var subtitle: String {
         switch service.phase {
         case .starting:
-            "Ligando o receptor de espelhamento."
+            String(localized: "Ligando o receptor de espelhamento.")
         case .ready:
             androidTab
-                ? "Veja e controle seu Android aqui, com o mouse e o teclado do Mac."
-                : "Veja a tela do seu iPhone ou iPad aqui, sem cabos e sem instalar nada no aparelho."
+                ? String(localized: "Veja e controle seu Android aqui, com o mouse e o teclado do Mac.")
+                : String(localized: "Veja a tela do seu iPhone ou iPad aqui, sem cabos e sem instalar nada no aparelho.")
         case .connecting:
-            service.pin == nil ? "A imagem aparece em instantes." : "Digite este código no aparelho para autorizar."
+            service.pin == nil ? String(localized: "A imagem aparece em instantes.") : String(localized: "Digite este código no aparelho para autorizar.")
         case .mirroring:
             ""
         case .failed(let message):
@@ -217,10 +217,10 @@ struct StatusPill: View {
 
     private var text: String {
         switch phase {
-        case .ready, .mirroring: "Visível na rede como “\(name)”"
-        case .connecting: "Recebendo conexão"
-        case .starting: "Iniciando"
-        case .failed: "Receptor parado"
+        case .ready, .mirroring: String(localized: "Visível na rede como “\(name)”")
+        case .connecting: String(localized: "Recebendo conexão")
+        case .starting: String(localized: "Iniciando")
+        case .failed: String(localized: "Receptor parado")
         }
     }
 }
@@ -253,7 +253,7 @@ struct StepsCard: View {
             .padding(.vertical, 6)
     }
 
-    private func step(_ number: Int, _ symbol: String, _ title: String, _ detail: String) -> some View {
+    private func step(_ number: Int, _ symbol: String, _ title: LocalizedStringKey, _ detail: LocalizedStringKey) -> some View {
         VStack(spacing: 10) {
             ZStack(alignment: .topTrailing) {
                 Image(systemName: symbol)
