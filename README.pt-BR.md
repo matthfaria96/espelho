@@ -49,6 +49,8 @@ Tudo o que o Espelho precisa vai dentro do app: sem Homebrew, sem drivers, nada 
 
 Android 10 ou mais antigo: ligue a *Depuração USB*, conecte o cabo e clique em **Usar sem fio**. Xiaomi/Redmi/POCO também precisam da *Depuração USB (configurações de segurança)* para aceitar toques; o Espelho avisa quando ela falta.
 
+Leu o QR code e nada aconteceu? Confira se o Mac e o celular estão no mesmo Wi‑Fi (rede de convidados não serve) e se o Espelho está ligado em *Ajustes do Sistema › Privacidade e Segurança › Rede Local*. O Espelho encontra o celular pelo Bonjour do próprio macOS e avisa quando essa permissão está desligada.
+
 | No Mac | Faz |
 |---|---|
 | Dois cliques · ⌃⌘F | Tela cheia |
@@ -58,7 +60,7 @@ Android 10 ou mais antigo: ligue a *Depuração USB*, conecte o cabo e clique em
 | Clicar, arrastar, rolar, digitar, ⌘V (Android) | Tocar, deslizar, rolar, digitar, colar |
 | Botão direito · botão do meio (Android) | Voltar · Início |
 
-Registros: `~/Library/Logs/Espelho.log` (AirPlay) e `~/Library/Logs/Espelho-Android.log`. `ESPELHO_DEBUG=1 /Applications/Espelho.app/Contents/MacOS/Espelho` mostra a taxa de quadros e o ritmo a cada segundo.
+Registros: `~/Library/Logs/Espelho.log` (AirPlay) e `~/Library/Logs/Espelho-Android.log` (inclui o que o pareamento viu na rede). `ESPELHO_DEBUG=1 /Applications/Espelho.app/Contents/MacOS/Espelho` mostra a taxa de quadros e o ritmo a cada segundo.
 
 ## Como funciona
 

@@ -13,6 +13,7 @@
 "A imagem aparece em instantes." = "A imagem aparece em instantes.";
 "Abra **Configurações** e encontre **Número de compilação**. Toque nele **7 vezes seguidas** até aparecer a mensagem de que o modo de desenvolvedor foi ativado. Se pedir, digite o PIN do aparelho." = "Abra **Configurações** e encontre **Número de compilação**. Toque nele **7 vezes seguidas** até aparecer a mensagem de que o modo de desenvolvedor foi ativado. Se pedir, digite o PIN do aparelho.";
 "Abra a Central de Controle" = "Abra a Central de Controle";
+"Abrir Ajustes de Rede Local" = "Abrir Ajustes de Rede Local";
 "Abrir Ajustes…" = "Abrir Ajustes…";
 "Abrir Registro de Diagnóstico" = "Abrir Registro de Diagnóstico";
 "Abrir o Espelho ao iniciar o Mac" = "Abrir o Espelho ao iniciar o Mac";
@@ -104,6 +105,7 @@
 "Iniciando…" = "Iniciando…";
 "Início" = "Início";
 "Leia o código com o Android" = "Leia o código com o Android";
+"Leu o código e nada aconteceu? Confira se o Android e o Mac estão no mesmo Wi-Fi (rede de convidados não serve) e se o Espelho está ligado em **Privacidade e Segurança › Rede Local**." = "Leu o código e nada aconteceu? Confira se o Android e o Mac estão no mesmo Wi-Fi (rede de convidados não serve) e se o Espelho está ligado em **Privacidade e Segurança › Rede Local**.";
 "Leva 10 segundos" = "Leva 10 segundos";
 "Libere as Opções do desenvolvedor" = "Libere as Opções do desenvolvedor";
 "Ligando o receptor de espelhamento." = "Ligando o receptor de espelhamento.";
@@ -138,6 +140,7 @@
 "Não foi possível salvar a captura" = "Não foi possível salvar a captura";
 "Não leu? Na aba **Android** da tela inicial há a opção **Parear com código** (6 números)." = "Não leu? Na aba **Android** da tela inicial há a opção **Parear com código** (6 números).";
 "Número de compilação" = "Número de compilação";
+"O Android apareceu, mas o macOS não deixou o Espelho falar com ele." = "O Android apareceu, mas o macOS não deixou o Espelho falar com ele.";
 "O Android encerrou o espelhamento." = "O Android encerrou o espelhamento.";
 "O Android não conseguiu capturar a tela." = "O Android não conseguiu capturar a tela.";
 "O Android não foi encontrado na rede. Deixe a janela do código aberta nele e confira se os dois estão no mesmo Wi-Fi." = "O Android não foi encontrado na rede. Deixe a janela do código aberta nele e confira se os dois estão no mesmo Wi-Fi.";
@@ -153,6 +156,7 @@
 "O código expirou. Gere um novo e tente de novo." = "O código expirou. Gere um novo e tente de novo.";
 "O código não confere. Tente de novo." = "O código não confere. Tente de novo.";
 "O espelhamento parou de responder." = "O espelhamento parou de responder.";
+"O macOS está bloqueando o Espelho na rede local. Ligue o Espelho em **Privacidade e Segurança › Rede Local**." = "O macOS está bloqueando o Espelho na rede local. Ligue o Espelho em **Privacidade e Segurança › Rede Local**.";
 "O macOS tem um receptor próprio que também aparece na lista, com o nome deste Mac. Desligue-o em AirDrop e Handoff › Receptor AirPlay para ver só “%@”." = "O macOS tem um receptor próprio que também aparece na lista, com o nome deste Mac. Desligue-o em AirDrop e Handoff › Receptor AirPlay para ver só “%@”.";
 "O modo de desenvolvedor foi ativado." = "O modo de desenvolvedor foi ativado.";
 "O nome é o que aparece na lista do Espelhar Tela. Com o código ligado, cada aparelho novo precisa digitar um número de 4 dígitos mostrado aqui." = "O nome é o que aparece na lista do Espelhar Tela. Com o código ligado, cada aparelho novo precisa digitar um número de 4 dígitos mostrado aqui.";

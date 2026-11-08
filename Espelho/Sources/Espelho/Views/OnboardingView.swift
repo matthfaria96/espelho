@@ -401,7 +401,9 @@ private struct LivePairingArt: View {
                 }
             }
             .font(.system(size: 12, weight: .medium))
-            .frame(height: 60, alignment: .top)
+            .frame(minHeight: 60, alignment: .top)
+
+            PairingTroubleHint()
         }
         .onAppear { android.beginPairing(showSheet: false) }
         .onDisappear { android.cancelPairing() }

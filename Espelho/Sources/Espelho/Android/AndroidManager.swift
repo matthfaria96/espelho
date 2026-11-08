@@ -33,6 +33,10 @@ final class AndroidManager: ObservableObject {
     @Published var showPairing = false
     /// Serial of the cable-connected device being switched to Wi-Fi.
     @Published private(set) var goingWireless: String?
+    /// macOS keeps Espelho off the local network (Privacy & Security › Local Network).
+    @Published private(set) var localNetworkBlocked = false
+    /// The QR code has been up for a while and no phone showed up on the network.
+    @Published private(set) var pairingSlow = false
 
     /// Whether to look for devices continuously (Android tab open, or known devices exist).
     var wantsDiscovery = false { didSet { if wantsDiscovery != oldValue { updatePolling() } } }
@@ -92,6 +96,44 @@ final class AndroidManager: ObservableObject {
         } else if !should {
             pollTask?.cancel()
             pollTask = nil
+            if pairingTask == nil { AndroidBonjour.shared.stop() }
+        }
+    }
+
+    /// Android services on the network (pairing codes waiting, phones with Wireless debugging on).
+    /// macOS's own Bonjour first: adb's mDNS client often hears nothing when the app is opened
+    /// from the Finder. adb's list still counts, for whatever it does see.
+    private func networkServices() async -> [ADBText.Service] {
+        AndroidBonjour.shared.start()
+        let fromADB = ADBText.services(await ADB.run(["mdns", "services"], timeout: 5).output)
+        updateLocalNetworkBlocked()
+        return ADBText.merge(AndroidBonjour.shared.services(), fromADB)
+    }
+
+    /// adb itself was refused a connection to a phone that had just announced itself.
+    private var adbRefused = false
+
+    private func updateLocalNetworkBlocked() {
+        let blocked = AndroidBonjour.shared.isDenied || adbRefused
+        if blocked != localNetworkBlocked { localNetworkBlocked = blocked }
+    }
+
+    /// When macOS keeps Espelho off the local network, `adb pair` to a phone that has just
+    /// announced itself fails with "No route to host" or "protocol fault (couldn't read status
+    /// message)". A server started by another app (Terminal, Android Studio) carries that app's
+    /// permission instead, so the next attempt starts Espelho's own.
+    private func isNetworkRefusal(_ output: String) async -> Bool {
+        guard output.contains("No route to host") || output.contains("protocol fault") else { return false }
+        adbRefused = true
+        updateLocalNetworkBlocked()
+        await ADB.run(["kill-server"], timeout: 5)
+        await ADB.startServer()
+        return true
+    }
+
+    static func openLocalNetworkSettings() {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_LocalNetwork") {
+            NSWorkspace.shared.open(url)
         }
     }
 
@@ -136,7 +178,7 @@ final class AndroidManager: ObservableObject {
             connectAttempts[endpoint] = Date()
             await ADB.run(["connect", endpoint], timeout: 4)
         }
-        let services = ADBText.services(await ADB.run(["mdns", "services"], timeout: 5).output)
+        let services = await networkServices()
         for service in services where service.type.contains("adb-tls-connect") {
             guard let id = known.first(where: { service.name.contains($0) }), !present.contains(id) else { continue }
             if let last = connectAttempts[service.address], Date().timeIntervalSince(last) < 15 { continue }
@@ -219,15 +261,26 @@ final class AndroidManager: ObservableObject {
         pairingPassword = String((0..<10).map { _ in letters.randomElement()! })
         pairing = .waiting(qr: "WIFI:T:ADB;S:\(pairingName);P:\(pairingPassword);;")
         let name = pairingName, password = pairingPassword
+        ADB.note("Pareamento: QR code \(name) na tela")
         pairingTask = Task { [weak self] in
             await ADB.startServer()
-            let deadline = Date().addingTimeInterval(300)
-            while !Task.isCancelled, Date() < deadline {
-                let services = ADBText.services(await ADB.run(["mdns", "services"], timeout: 5).output)
+            let started = Date()
+            var seen: [String] = []
+            while !Task.isCancelled, Date().timeIntervalSince(started) < 300 {
+                guard let self else { return }
+                let services = await self.networkServices()
                 if let target = services.first(where: { $0.type.contains("adb-tls-pairing") && $0.name == name }) {
-                    await self?.pair(address: target.address, secret: password)
+                    ADB.note("Pareamento: \(name) apareceu em \(target.address)")
+                    await self.pair(address: target.address, secret: password)
                     return
                 }
+                let now = services.map { "\($0.name) \($0.type) \($0.address)" }.sorted()
+                if now != seen {
+                    seen = now
+                    ADB.note("Pareamento: na rede, \(now.isEmpty ? "nenhum Android" : now.joined(separator: ", "))")
+                }
+                // Scanned and nothing showed up? Usually the Local Network permission or the Wi‑Fi.
+                if !self.pairingSlow, Date().timeIntervalSince(started) > 30 { self.pairingSlow = true }
                 try? await Task.sleep(for: .seconds(1))
             }
             if !Task.isCancelled { self?.pairing = .failed(String(localized: "O código expirou. Gere um novo e tente de novo.")) }
@@ -238,16 +291,21 @@ final class AndroidManager: ObservableObject {
     func pair(code: String) {
         pairingTask?.cancel()
         pairing = .pairing
+        pairingSlow = false
+        adbRefused = false
+        updateLocalNetworkBlocked()
+        ADB.note("Pareamento: com código de 6 números")
         pairingTask = Task { [weak self] in
             await ADB.startServer()
-            for _ in 0..<10 {
-                let services = ADBText.services(await ADB.run(["mdns", "services"], timeout: 5).output)
-                if let target = services.first(where: { $0.type.contains("adb-tls-pairing") }) {
-                    await self?.pair(address: target.address, secret: code)
+            for _ in 0..<15 {
+                guard let self else { return }
+                if let target = await self.networkServices().first(where: { $0.type.contains("adb-tls-pairing") }) {
+                    await self.pair(address: target.address, secret: code)
                     return
                 }
                 try? await Task.sleep(for: .seconds(1))
             }
+            ADB.note("Pareamento: nenhum Android com o código aberto foi encontrado")
             self?.pairing = .failed(String(localized: "O Android não foi encontrado na rede. Deixe a janela do código aberta nele e confira se os dois estão no mesmo Wi-Fi."))
         }
     }
@@ -256,6 +314,10 @@ final class AndroidManager: ObservableObject {
         pairingTask?.cancel()
         pairingTask = nil
         pairing = .idle
+        pairingSlow = false
+        adbRefused = false
+        updateLocalNetworkBlocked()
+        if pollTask == nil { AndroidBonjour.shared.stop() }
     }
 
     func closePairing() {
@@ -266,31 +328,44 @@ final class AndroidManager: ObservableObject {
 
     private func pair(address: String, secret: String) async {
         pairing = .pairing
+        pairingSlow = false
         let result = await ADB.run(["pair", address, secret], timeout: 20)
-        guard result.output.contains("Successfully paired") else {
-            pairing = .failed(result.output.lowercased().contains("wrong password") || result.output.lowercased().contains("failed")
-                              ? String(localized: "O código não confere. Tente de novo.")
-                              : String(localized: "Não foi possível parear. Tente de novo."))
+        let output = result.output.trimmingCharacters(in: .whitespacesAndNewlines)
+        ADB.note("adb pair \(address): \(output)")
+        guard output.contains("Successfully paired") else {
+            let lowered = output.lowercased()
+            if await isNetworkRefusal(output) {
+                pairing = .failed(String(localized: "O Android apareceu, mas o macOS não deixou o Espelho falar com ele."))
+            } else {
+                pairing = .failed(lowered.contains("wrong password") || lowered.contains("failed")
+                                  ? String(localized: "O código não confere. Tente de novo.")
+                                  : String(localized: "Não foi possível parear. Tente de novo."))
+            }
             return
         }
         pairing = .connecting
         // "Successfully paired to 192.168.0.20:37115 [guid=adb-R58N12ABCDE-Xy1z]"
-        let guid = result.output.range(of: #"guid=([^\]\s]+)"#, options: .regularExpression)
-            .map { String(result.output[$0].dropFirst(5)) }
+        let guid = output.range(of: #"guid=([^\]\s]+)"#, options: .regularExpression)
+            .map { String(output[$0].dropFirst(5)) }
         let host = address.split(separator: ":").first.map(String.init) ?? address
 
         let deadline = Date().addingTimeInterval(25)
+        var tried = Set<String>()
         while !Task.isCancelled, Date() < deadline {
-            let services = ADBText.services(await ADB.run(["mdns", "services"], timeout: 5).output)
+            let services = await networkServices()
             if let connect = services.first(where: {
                 $0.type.contains("adb-tls-connect") && (guid.map($0.name.contains) ?? $0.address.hasPrefix(host + ":"))
             }) {
-                await ADB.run(["connect", connect.address], timeout: 10)
+                let result = await ADB.run(["connect", connect.address], timeout: 10)
+                if tried.insert(connect.address).inserted {
+                    ADB.note("adb connect \(connect.address): \(result.output.trimmingCharacters(in: .whitespacesAndNewlines))")
+                }
             }
             await refresh()
             if let device = devices.first(where: {
                 $0.isReady && $0.isWireless && ($0.serial.hasPrefix(host + ":") || guid.map($0.serial.contains) == true)
             }) {
+                ADB.note("Pareamento: conectado (\(device.serial))")
                 remember(device)
                 closePairing()
                 MirrorService.shared.startAndroid(device)
@@ -298,6 +373,7 @@ final class AndroidManager: ObservableObject {
             }
             try? await Task.sleep(for: .seconds(1))
         }
+        ADB.note("Pareamento: pareado, mas o serviço de conexão não apareceu (guid \(guid ?? "?"))")
         pairing = .failed(String(localized: "Pareado, mas o Android não se conectou. Confira se a Depuração por Wi-Fi continua ligada."))
     }
 
