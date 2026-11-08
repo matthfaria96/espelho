@@ -186,6 +186,16 @@ private func be64(_ v: UInt64) -> [UInt8] { be32(UInt32(v >> 32)) + be32(UInt32(
     ])
 }
 
+@Test func mergesServicesFromBothFinders() {
+    let bonjour = [ADBText.Service(name: "espelho-ab12cd", type: "_adb-tls-pairing._tcp.", address: "192.168.0.20:37115")]
+    let adb = [
+        ADBText.Service(name: "espelho-ab12cd", type: "_adb-tls-pairing._tcp", address: "192.168.0.20:37115"),
+        ADBText.Service(name: "adb-R58N12ABCDE-Xy1z", type: "_adb-tls-connect._tcp", address: "192.168.0.20:41231"),
+    ]
+    #expect(ADBText.merge(bonjour, adb) == [bonjour[0], adb[1]])
+    #expect(ADBText.merge([], adb) == adb)
+}
+
 @Test func findsPhoneWifiAddress() {
     #expect(ADBText.wifiAddress(fromIpRoute: """
     10.0.0.0/8 dev rmnet0 proto kernel scope link src 10.20.30.40

@@ -17,6 +17,23 @@ enum ADB {
     static let logURL = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent("Library/Logs/Espelho-Android.log")
 
+    /// The log, opened for appending (started over past 2 MB).
+    private static func openLog() -> FileHandle? {
+        if let size = (try? FileManager.default.attributesOfItem(atPath: logURL.path))?[.size] as? Int, size > 2_000_000 {
+            try? FileManager.default.removeItem(at: logURL)
+        }
+        let fd = open(logURL.path, O_WRONLY | O_APPEND | O_CREAT, 0o644)
+        return fd < 0 ? nil : FileHandle(fileDescriptor: fd, closeOnDealloc: true)
+    }
+
+    private static let logQueue = DispatchQueue(label: "espelho.android.log")
+
+    /// One line in the log: what pairing and discovery saw, for when something doesn't connect.
+    static func note(_ text: String) {
+        let line = "\(Date().formatted(.iso8601)) \(text)\n"
+        logQueue.async { openLog()?.write(Data(line.utf8)) }
+    }
+
     /// The adb daemon is started on its own first, with no pipes attached: a daemon that
     /// inherits our pipes would keep them open forever.
     static func startServer() async {
@@ -66,16 +83,15 @@ enum ADB {
         p.executableURL = url
         p.arguments = args
         p.standardInput = FileHandle.nullDevice
-        FileManager.default.createFile(atPath: logURL.path, contents: nil)
-        let log = try? FileHandle(forWritingTo: logURL)
+        let log = openLog()
+        log?.write(Data("\(Date().formatted(.iso8601)) adb \(args.joined(separator: " "))\n".utf8))
         let pipe = Pipe()
         p.standardOutput = pipe
         p.standardError = pipe
         pipe.fileHandleForReading.readabilityHandler = { handle in
             let data = handle.availableData
             if data.isEmpty {
-                handle.readabilityHandler = nil
-                try? log?.close()
+                handle.readabilityHandler = nil // releases `log`, which closes it
                 return
             }
             log?.write(data)

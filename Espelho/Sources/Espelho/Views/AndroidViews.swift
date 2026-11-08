@@ -195,6 +195,7 @@ struct AndroidPairingView: View {
                 VStack(spacing: 14) {
                     if useCode { codeEntry } else { qrPanel }
                     statusLine
+                    PairingTroubleHint()
                 }
                 .frame(width: 236)
             }
@@ -308,5 +309,41 @@ struct AndroidPairingView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+    }
+}
+
+/// Under the pairing code: what usually keeps a phone that scanned it from showing up.
+struct PairingTroubleHint: View {
+    @ObservedObject var android = AndroidManager.shared
+
+    var body: some View {
+        if android.localNetworkBlocked {
+            hint("lock.shield", .orange,
+                 "O macOS está bloqueando o Espelho na rede local. Ligue o Espelho em **Privacidade e Segurança › Rede Local**.")
+        } else if android.pairingSlow && isWaiting {
+            hint("questionmark.circle", .secondary,
+                 "Leu o código e nada aconteceu? Confira se o Android e o Mac estão no mesmo Wi-Fi (rede de convidados não serve) e se o Espelho está ligado em **Privacidade e Segurança › Rede Local**.")
+        }
+    }
+
+    private var isWaiting: Bool {
+        if case .waiting = android.pairing { return true }
+        return false
+    }
+
+    private func hint(_ symbol: String, _ color: Color, _ text: LocalizedStringKey) -> some View {
+        VStack(spacing: 6) {
+            Label {
+                Text(text).fixedSize(horizontal: false, vertical: true)
+            } icon: {
+                Image(systemName: symbol).foregroundStyle(color)
+            }
+            .font(.system(size: 11))
+            .foregroundStyle(.secondary)
+            Button("Abrir Ajustes de Rede Local") { AndroidManager.openLocalNetworkSettings() }
+                .buttonStyle(.link)
+                .font(.system(size: 11, weight: .medium))
+        }
+        .transition(.opacity)
     }
 }

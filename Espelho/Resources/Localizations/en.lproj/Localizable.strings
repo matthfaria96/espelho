@@ -13,6 +13,7 @@
 "A imagem aparece em instantes." = "The picture appears in a moment.";
 "Abra **Configurações** e encontre **Número de compilação**. Toque nele **7 vezes seguidas** até aparecer a mensagem de que o modo de desenvolvedor foi ativado. Se pedir, digite o PIN do aparelho." = "Open **Settings** and find **Build number**. Tap it **7 times in a row** until a message says developer mode is on. If asked, enter the device’s PIN.";
 "Abra a Central de Controle" = "Open Control Center";
+"Abrir Ajustes de Rede Local" = "Open Local Network Settings";
 "Abrir Ajustes…" = "Open Settings…";
 "Abrir Registro de Diagnóstico" = "Open Diagnostic Log";
 "Abrir o Espelho ao iniciar o Mac" = "Open Espelho at login";
@@ -104,6 +105,7 @@
 "Iniciando…" = "Starting…";
 "Início" = "Home";
 "Leia o código com o Android" = "Scan the Code with the Android";
+"Leu o código e nada aconteceu? Confira se o Android e o Mac estão no mesmo Wi-Fi (rede de convidados não serve) e se o Espelho está ligado em **Privacidade e Segurança › Rede Local**." = "Scanned it and nothing happened? Check that the Android and the Mac are on the same Wi‑Fi (a guest network won’t do) and that Espelho is on in **Privacy & Security › Local Network**.";
 "Leva 10 segundos" = "Takes 10 seconds";
 "Libere as Opções do desenvolvedor" = "Unlock Developer Options";
 "Ligando o receptor de espelhamento." = "Starting the mirroring receiver.";
@@ -138,6 +140,7 @@
 "Não foi possível salvar a captura" = "Couldn’t save the screenshot";
 "Não leu? Na aba **Android** da tela inicial há a opção **Parear com código** (6 números)." = "Didn’t scan? The **Android** tab on the main screen has **Pair with Code** (6 digits).";
 "Número de compilação" = "Build number";
+"O Android apareceu, mas o macOS não deixou o Espelho falar com ele." = "The Android showed up, but macOS didn’t let Espelho talk to it.";
 "O Android encerrou o espelhamento." = "The Android ended mirroring.";
 "O Android não conseguiu capturar a tela." = "The Android couldn’t capture its screen.";
 "O Android não foi encontrado na rede. Deixe a janela do código aberta nele e confira se os dois estão no mesmo Wi-Fi." = "The Android wasn’t found on the network. Keep the code screen open on it and check that both are on the same Wi‑Fi.";
@@ -153,6 +156,7 @@
 "O código expirou. Gere um novo e tente de novo." = "The code expired. Make a new one and try again.";
 "O código não confere. Tente de novo." = "The code doesn’t match. Try again.";
 "O espelhamento parou de responder." = "Mirroring stopped responding.";
+"O macOS está bloqueando o Espelho na rede local. Ligue o Espelho em **Privacidade e Segurança › Rede Local**." = "macOS is keeping Espelho off the local network. Turn Espelho on in **Privacy & Security › Local Network**.";
 "O macOS tem um receptor próprio que também aparece na lista, com o nome deste Mac. Desligue-o em AirDrop e Handoff › Receptor AirPlay para ver só “%@”." = "macOS has its own receiver that also shows up in the list, with this Mac’s name. Turn it off in AirDrop & Handoff › AirPlay Receiver to see only “%@”.";
 "O modo de desenvolvedor foi ativado." = "You are now a developer!";
 "O nome é o que aparece na lista do Espelhar Tela. Com o código ligado, cada aparelho novo precisa digitar um número de 4 dígitos mostrado aqui." = "The name is what shows up in the Screen Mirroring list. With the code on, each new device must enter a 4-digit number shown here.";

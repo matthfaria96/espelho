@@ -277,6 +277,19 @@ public enum ADBText {
         public var name: String
         public var type: String
         public var address: String
+        public init(name: String, type: String, address: String) {
+            self.name = name; self.type = type; self.address = address
+        }
+    }
+
+    /// The same services seen by several finders (macOS's Bonjour, adb's own mDNS): one per name
+    /// and type, the first list winning. Types compare without the final dot ("_tcp." = "_tcp").
+    public static func merge(_ lists: [Service]...) -> [Service] {
+        var seen = Set<String>()
+        return lists.joined().filter { service in
+            let type = service.type.hasSuffix(".") ? String(service.type.dropLast()) : service.type
+            return seen.insert(service.name + "\t" + type).inserted
+        }
     }
 
     /// `adb shell ip route`: the phone's Wi-Fi address ("... dev wlan0 ... src 192.168.0.20").

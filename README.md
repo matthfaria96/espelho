@@ -49,6 +49,8 @@ Everything Espelho needs travels inside the app: no Homebrew, no drivers, nothin
 
 Android 10 or older: turn on *USB debugging*, plug the cable and click **Go Wireless**. Xiaomi/Redmi/POCO also need *USB debugging (Security settings)* to accept touches; Espelho tells you when that's missing.
 
+Scanned the QR code and nothing happened? Check that the Mac and the phone are on the same Wi‑Fi (not a guest network) and that Espelho is on in *System Settings › Privacy & Security › Local Network*. Espelho finds the phone through macOS's own Bonjour and says so when that permission is off.
+
 | On the Mac | Does |
 |---|---|
 | Double click · ⌃⌘F | Full screen |
@@ -58,7 +60,7 @@ Android 10 or older: turn on *USB debugging*, plug the cable and click **Go Wire
 | Click, drag, scroll, type, ⌘V (Android) | Tap, swipe, scroll, type, paste |
 | Right click · middle click (Android) | Back · Home |
 
-Logs: `~/Library/Logs/Espelho.log` (AirPlay) and `~/Library/Logs/Espelho-Android.log`. `ESPELHO_DEBUG=1 /Applications/Espelho.app/Contents/MacOS/Espelho` prints frame rate and pacing every second.
+Logs: `~/Library/Logs/Espelho.log` (AirPlay) and `~/Library/Logs/Espelho-Android.log` (also what pairing saw on the network). `ESPELHO_DEBUG=1 /Applications/Espelho.app/Contents/MacOS/Espelho` prints frame rate and pacing every second.
 
 ## How it works
 
