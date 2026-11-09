@@ -1,6 +1,6 @@
 # Sourced by make-espelho-app.sh and make-release.sh: version and Info.plist of Espelho.
-ESPELHO_VERSION=1.3.0
-ESPELHO_BUILD=5   # CFBundleVersion: what Sparkle compares, must go up every release
+ESPELHO_VERSION=1.3.1
+ESPELHO_BUILD=6   # CFBundleVersion: what Sparkle compares, must go up every release
 
 # write_info_plist <Info.plist path>   (English; translations in Resources/<lang>.lproj, see
 # scripts/make-localizations.py)
